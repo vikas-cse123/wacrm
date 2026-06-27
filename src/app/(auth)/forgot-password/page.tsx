@@ -78,7 +78,12 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md border-border bg-card">
         <CardHeader className="items-center text-center">
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            <MessageSquare className="h-6 w-6 text-primary" />
+            {/* <MessageSquare className="h-6 w-6 text-primary" /> */}
+            <img
+  src="/brand/interscale-logo.png"
+  alt="Interscale Marketing"
+  className="h-12 w-12 rounded-xl object-contain"
+/>
           </div>
           <CardTitle className="text-xl text-foreground">Reset password</CardTitle>
           <CardDescription className="text-muted-foreground">

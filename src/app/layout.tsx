@@ -20,16 +20,24 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "wacrm",
-    template: "%s — wacrm",
+    default: "Interscale Marketing",
+    template: "%s — Interscale Marketing",
   },
-  description: "Self-hostable CRM template for WhatsApp.",
+  description: "Interscale Marketing WhatsApp CRM.",
   robots: {
     index: false,
     follow: false,
   },
   icons: {
-    icon: [{ url: "/icon" }],
+    icon: [
+      {
+        url: "/icon.png",
+        type: "image/png",
+        sizes: "192x192",
+      },
+    ],
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
   formatDetection: {
     email: false,
@@ -86,13 +94,6 @@ export default function RootLayout({
       data-theme={DEFAULT_THEME}
       data-mode={DEFAULT_MODE}
       className={`${inter.variable} h-full antialiased`}
-      // The `theme-boot` script below rewrites `data-theme` and
-      // `data-mode` on <html> from localStorage before React hydrates,
-      // so for any non-default choice the client DOM intentionally
-      // differs from the server-rendered defaults. suppressHydration-
-      // Warning silences the expected mismatch — it only applies to
-      // this element's own attributes, so genuine mismatches in
-      // children still surface.
       suppressHydrationWarning
     >
       <head>

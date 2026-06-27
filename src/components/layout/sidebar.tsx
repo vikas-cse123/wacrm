@@ -93,7 +93,7 @@ const navItems: NavItem[] = [
   { href: "/pipelines", label: "Pipelines", icon: GitBranch },
   { href: "/broadcasts", label: "Broadcasts", icon: Radio },
   { href: "/automations", label: "Automations", icon: Zap },
-  { href: "/flows", label: "Flows", icon: Workflow, beta: true },
+  { href: "/flows", label: "Flows", icon: Workflow, beta: false },
 ];
 
 const bottomNavItems = [
@@ -178,13 +178,23 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
         {/* Logo row. On mobile we put a close button here; on desktop the
             close button is hidden since the sidebar is always-visible. */}
         <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border px-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex min-w-0 items-center gap-1.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <MessageSquare className="h-4 w-4" />
+              {/* <MessageSquare className="h-4 w-4" /> */}
+              <img
+  src="/brand/interscale-logo.png"
+  alt="Interscale Marketing"
+  className="h-8 w-8 rounded-lg object-contain"
+/>
             </div>
-            <span className="text-sm font-semibold text-foreground">
-              CRM Template for WhatsApp
-            </span>
+           <span className="flex min-w-0 flex-col text-foreground">
+  <span className="whitespace-nowrap text-[15.6px] font-semibold leading-[16px]">
+    WhatsApp CRM
+  </span>
+  <span className="whitespace-nowrap text-[9.4px] font-semibold leading-[10px]">
+    From Interscale Marketing
+  </span>
+</span>
           </Link>
           <button
             type="button"

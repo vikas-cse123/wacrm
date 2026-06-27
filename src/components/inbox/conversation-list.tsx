@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import type { Conversation, ConversationStatus } from "@/types";
+import type { Conversation, ConversationStatus, Tag } from "@/types";
 import { Search, ChevronDown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,9 +54,15 @@ export function ConversationList({
   onConversationsLoaded,
   resyncToken = 0,
 }: ConversationListProps) {
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<InboxFilter>("all");
-  const [loading, setLoading] = useState(true);
+const [search, setSearch] = useState("");
+const [filter, setFilter] = useState<InboxFilter>("all");
+const [tagFilter, setTagFilter] = useState<string>("all");
+const [tags, setTags] = useState<Tag[]>([]);
+const [tagContactIds, setTagContactIds] = useState<Set<string>>(new Set());
+const [loading, setLoading] = useState(true);
+
+const { user } = useAuth();
+  
 
   // Keep the latest callback in a ref so the fetch effect below can
   // have a stable, empty-dep identity. Previously the fetch useCallback
@@ -73,6 +80,67 @@ export function ConversationList({
   useEffect(() => {
     onConversationsLoadedRef.current = onConversationsLoaded;
   });
+
+  useEffect(() => {
+  if (!user?.id) return;
+
+  const supabase = createClient();
+  let cancelled = false;
+
+  (async () => {
+    const { data, error } = await supabase
+      .from("tags")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true });
+
+    if (cancelled) return;
+
+    if (error) {
+      console.error("Failed to fetch tags:", error);
+      return;
+    }
+
+    setTags(data || []);
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+}, [user?.id]);
+
+useEffect(() => {
+  if (tagFilter === "all") {
+    setTagContactIds(new Set());
+    return;
+  }
+
+  const supabase = createClient();
+  let cancelled = false;
+
+  (async () => {
+    const { data, error } = await supabase
+      .from("contact_tags")
+      .select("contact_id")
+      .eq("tag_id", tagFilter);
+
+    if (cancelled) return;
+
+    if (error) {
+      console.error("Failed to fetch contacts for tag:", error);
+      setTagContactIds(new Set());
+      return;
+    }
+
+    setTagContactIds(
+      new Set((data || []).map((row) => row.contact_id).filter(Boolean)),
+    );
+  })();
+
+  return () => {
+    cancelled = true;
+  };
+}, [tagFilter]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -118,6 +186,12 @@ export function ConversationList({
     } else if (filter !== "all") {
       result = result.filter((c) => c.status === filter);
     }
+    if (tagFilter !== "all") {
+  result = result.filter((c) => {
+    const contactId = c.contact?.id;
+    return contactId ? tagContactIds.has(contactId) : false;
+  });
+}
 
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -130,7 +204,7 @@ export function ConversationList({
     }
 
     return result;
-  }, [conversations, filter, search]);
+  }, [conversations, filter, search,tagFilter, tagContactIds]);
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +221,7 @@ export function ConversationList({
   );
 
   const activeFilter = FILTER_OPTIONS.find((o) => o.value === filter);
+  const activeTag = tags.find((tag) => tag.id === tagFilter);
 
   return (
     // w-full on mobile so the list occupies the whole viewport when it's
@@ -165,31 +240,59 @@ export function ConversationList({
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex items-center justify-center h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted">
-              {activeFilter?.label ?? "All"}
-              <ChevronDown className="h-3 w-3" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            className="border-border bg-popover"
-          >
-            {FILTER_OPTIONS.map((opt) => (
-              <DropdownMenuItem
-                key={opt.value}
-                onClick={() => setFilter(opt.value)}
-                className={cn(
-                  "text-sm",
-                  filter === opt.value
-                    ? "text-primary"
-                    : "text-popover-foreground"
-                )}
-              >
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+       <div className="flex flex-wrap items-center gap-2">
+  <DropdownMenu>
+    <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+      {activeFilter?.label ?? "All"}
+      <ChevronDown className="h-3 w-3" />
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="start" className="border-border bg-popover">
+      {FILTER_OPTIONS.map((opt) => (
+        <DropdownMenuItem
+          key={opt.value}
+          onClick={() => setFilter(opt.value)}
+          className={cn(
+            "text-sm",
+            filter === opt.value ? "text-primary" : "text-popover-foreground",
+          )}
+        >
+          {opt.label}
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
+
+  <DropdownMenu>
+    <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+      {activeTag?.name ?? "All tags"}
+      <ChevronDown className="h-3 w-3" />
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="start" className="border-border bg-popover">
+      <DropdownMenuItem
+        onClick={() => setTagFilter("all")}
+        className={cn(
+          "text-sm",
+          tagFilter === "all" ? "text-primary" : "text-popover-foreground",
+        )}
+      >
+        All tags
+      </DropdownMenuItem>
+
+      {tags.map((tag) => (
+        <DropdownMenuItem
+          key={tag.id}
+          onClick={() => setTagFilter(tag.id)}
+          className={cn(
+            "text-sm",
+            tagFilter === tag.id ? "text-primary" : "text-popover-foreground",
+          )}
+        >
+          {tag.name}
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
+</div>
       </div>
 
       {/* Conversation Items.

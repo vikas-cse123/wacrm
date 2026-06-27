@@ -69,23 +69,33 @@ function LoginPageInner() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md border-border bg-card">
-        <CardHeader className="items-center text-center">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            {inviteToken ? (
-              <UsersRound className="h-6 w-6 text-primary" />
-            ) : (
-              <MessageSquare className="h-6 w-6 text-primary" />
-            )}
-          </div>
-          <CardTitle className="text-xl text-foreground">
-            {inviteToken ? "Sign in to accept" : "Welcome back"}
-          </CardTitle>
-          <CardDescription className="text-muted-foreground">
-            {inviteToken
-              ? "Sign in and we'll take you to the invitation."
-              : "Sign in to your account"}
-          </CardDescription>
-        </CardHeader>
+  <CardHeader className="items-center text-center">
+  <div className="mb-2 flex w-full justify-center">
+    {inviteToken ? (
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+        <UsersRound className="h-6 w-6 text-primary" />
+      </div>
+    ) : (
+      <img
+        src="/brand/interscale-logo.png"
+        alt="Interscale Marketing"
+        className="h-16 w-16 rounded-xl object-contain"
+      />
+    )}
+  </div>
+
+  <CardTitle className="text-xl text-foreground">
+    {inviteToken
+      ? "Sign in to accept"
+      : "Welcome to WhatsApp CRM"}
+  </CardTitle>
+
+  <CardDescription className="text-muted-foreground">
+    {inviteToken
+      ? "Sign in and we'll take you to the invitation."
+      : "Sign in to your account"}
+  </CardDescription>
+</CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             {error && (

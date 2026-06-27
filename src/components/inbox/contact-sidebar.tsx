@@ -1,5 +1,6 @@
 "use client";
 
+import { ContactTagsEditor } from "@/components/inbox/contact-tags-editor";
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -178,30 +179,17 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
           <div className="my-4 border-t border-border" />
 
           {/* Tags */}
-          <div>
-            <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              <TagIcon className="h-3 w-3" />
-              Tags
-            </div>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {tags.length === 0 ? (
-                <p className="px-1 text-xs text-muted-foreground">No tags</p>
-              ) : (
-                tags.map((tag) => (
-                  <span
-                    key={tag.contact_tag_id}
-                    className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                    style={{
-                      backgroundColor: `${tag.color}20`,
-                      color: tag.color,
-                    }}
-                  >
-                    {tag.name}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
+        {/* Tags */}
+<div>
+  <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+    <TagIcon className="h-3 w-3" />
+    Tags
+  </div>
+
+  <div className="mt-2">
+    {contact?.id && <ContactTagsEditor contactId={contact.id} />}
+  </div>
+</div>
 
           {/* Divider */}
           <div className="my-4 border-t border-border" />

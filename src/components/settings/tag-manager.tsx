@@ -168,31 +168,39 @@ export function TagManager() {
           <>
             {tags.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
-                    style={{
-                      backgroundColor: `${tag.color}20`,
-                      color: tag.color,
-                      border: `1px solid ${tag.color}40`,
-                    }}
-                  >
-                    <span
-                      className="size-2 rounded-full"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    {tag.name}
-                    <button
-                      type="button"
-                      onClick={() => confirmDelete(tag)}
-                      aria-label={`Delete ${tag.name}`}
-                      className="ml-0.5 rounded-full p-0.5 opacity-60 transition-opacity hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </span>
-                ))}
+{tags.map((tag) => (
+  <div
+    key={tag.id}
+    className="group inline-flex flex-col gap-1 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
+    style={{
+      backgroundColor: `${tag.color}20`,
+      color: tag.color,
+      border: `1px solid ${tag.color}40`,
+    }}
+  >
+    <div className="flex items-center gap-1.5">
+      <span
+        className="size-2 rounded-full"
+        style={{ backgroundColor: tag.color }}
+      />
+
+      <span>{tag.name}</span>
+
+      <button
+        type="button"
+        onClick={() => confirmDelete(tag)}
+        aria-label={`Delete ${tag.name}`}
+        className="ml-0.5 rounded-full p-0.5 opacity-60 transition-opacity hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+      >
+        <X className="size-3" />
+      </button>
+    </div>
+
+    <code className="max-w-[260px] break-all text-[10px] opacity-70">
+      {tag.id}
+    </code>
+  </div>
+))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
