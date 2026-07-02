@@ -9,11 +9,7 @@ import {
 } from "@/lib/inbox/conversations";
 import { cn } from "@/lib/utils";
 import type { Conversation, ConversationStatus, Tag } from "@/types";
-<<<<<<< HEAD
-import { Search, ChevronDown } from "lucide-react";
-=======
 import { Search, ChevronDown, X } from "lucide-react";
->>>>>>> upstream/main
 import { formatDistanceToNow } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
@@ -63,27 +59,19 @@ export function ConversationList({
   onConversationsLoaded,
   resyncToken = 0,
 }: ConversationListProps) {
-<<<<<<< HEAD
-const [search, setSearch] = useState("");
-const [filter, setFilter] = useState<InboxFilter>("all");
-const [tagFilter, setTagFilter] = useState<string>("all");
-const [tags, setTags] = useState<Tag[]>([]);
-const [tagContactIds, setTagContactIds] = useState<Set<string>>(new Set());
-const [loading, setLoading] = useState(true);
-
-const { user } = useAuth();
-  
-=======
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<InboxFilter>("all");
+  const [tagFilter, setTagFilter] = useState<string>("all");
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [tagContactIds, setTagContactIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   // Contact-based filters (issue #272). Tags use OR logic (a conversation
   // matches if its contact carries any selected tag), consistent with
   // Broadcast audience filtering. Company is an exact match on the field.
-  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
->>>>>>> upstream/main
+
+  const { user } = useAuth();
 
   // Keep the latest callback in a ref so the fetch effect below can
   // have a stable, empty-dep identity. Previously the fetch useCallback
@@ -103,65 +91,65 @@ const { user } = useAuth();
   });
 
   useEffect(() => {
-  if (!user?.id) return;
+    if (!user?.id) return;
 
-  const supabase = createClient();
-  let cancelled = false;
+    const supabase = createClient();
+    let cancelled = false;
 
-  (async () => {
-    const { data, error } = await supabase
-      .from("tags")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: true });
+    (async () => {
+      const { data, error } = await supabase
+        .from("tags")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
 
-    if (cancelled) return;
+      if (cancelled) return;
 
-    if (error) {
-      console.error("Failed to fetch tags:", error);
-      return;
-    }
+      if (error) {
+        console.error("Failed to fetch tags:", error);
+        return;
+      }
 
-    setTags(data || []);
-  })();
+      setTags(data || []);
+    })();
 
-  return () => {
-    cancelled = true;
-  };
-}, [user?.id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
-useEffect(() => {
-  if (tagFilter === "all") {
-    setTagContactIds(new Set());
-    return;
-  }
-
-  const supabase = createClient();
-  let cancelled = false;
-
-  (async () => {
-    const { data, error } = await supabase
-      .from("contact_tags")
-      .select("contact_id")
-      .eq("tag_id", tagFilter);
-
-    if (cancelled) return;
-
-    if (error) {
-      console.error("Failed to fetch contacts for tag:", error);
+  useEffect(() => {
+    if (tagFilter === "all") {
       setTagContactIds(new Set());
       return;
     }
 
-    setTagContactIds(
-      new Set((data || []).map((row) => row.contact_id).filter(Boolean)),
-    );
-  })();
+    const supabase = createClient();
+    let cancelled = false;
 
-  return () => {
-    cancelled = true;
-  };
-}, [tagFilter]);
+    (async () => {
+      const { data, error } = await supabase
+        .from("contact_tags")
+        .select("contact_id")
+        .eq("tag_id", tagFilter);
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error("Failed to fetch contacts for tag:", error);
+        setTagContactIds(new Set());
+        return;
+      }
+
+      setTagContactIds(
+        new Set((data || []).map((row) => row.contact_id).filter(Boolean)),
+      );
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tagFilter]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -239,12 +227,13 @@ useEffect(() => {
     } else if (filter !== "all") {
       result = result.filter((c) => c.status === filter);
     }
+
     if (tagFilter !== "all") {
-  result = result.filter((c) => {
-    const contactId = c.contact?.id;
-    return contactId ? tagContactIds.has(contactId) : false;
-  });
-}
+      result = result.filter((c) => {
+        const contactId = c.contact?.id;
+        return contactId ? tagContactIds.has(contactId) : false;
+      });
+    }
 
     // Contact-based filters (tags via OR logic, exact company match).
     if (selectedTagIds.length > 0 || selectedCompany !== null) {
@@ -267,10 +256,15 @@ useEffect(() => {
     }
 
     return result;
-<<<<<<< HEAD
-  }, [conversations, filter, search,tagFilter, tagContactIds]);
-=======
-  }, [conversations, filter, search, selectedTagIds, selectedCompany]);
+  }, [
+    conversations,
+    filter,
+    search,
+    tagFilter,
+    tagContactIds,
+    selectedTagIds,
+    selectedCompany,
+  ]);
 
   const toggleTag = useCallback((id: string) => {
     setSelectedTagIds((prev) =>
@@ -284,7 +278,6 @@ useEffect(() => {
   }, []);
 
   const hasContactFilters = selectedTagIds.length > 0 || selectedCompany !== null;
->>>>>>> upstream/main
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -320,83 +313,54 @@ useEffect(() => {
           />
         </div>
 
-<<<<<<< HEAD
-       <div className="flex flex-wrap items-center gap-2">
-  <DropdownMenu>
-    <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-      {activeFilter?.label ?? "All"}
-      <ChevronDown className="h-3 w-3" />
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="start" className="border-border bg-popover">
-      {FILTER_OPTIONS.map((opt) => (
-        <DropdownMenuItem
-          key={opt.value}
-          onClick={() => setFilter(opt.value)}
-          className={cn(
-            "text-sm",
-            filter === opt.value ? "text-primary" : "text-popover-foreground",
-          )}
-        >
-          {opt.label}
-        </DropdownMenuItem>
-      ))}
-    </DropdownMenuContent>
-  </DropdownMenu>
-
-  <DropdownMenu>
-    <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-      {activeTag?.name ?? "All tags"}
-      <ChevronDown className="h-3 w-3" />
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="start" className="border-border bg-popover">
-      <DropdownMenuItem
-        onClick={() => setTagFilter("all")}
-        className={cn(
-          "text-sm",
-          tagFilter === "all" ? "text-primary" : "text-popover-foreground",
-        )}
-      >
-        All tags
-      </DropdownMenuItem>
-
-      {tags.map((tag) => (
-        <DropdownMenuItem
-          key={tag.id}
-          onClick={() => setTagFilter(tag.id)}
-          className={cn(
-            "text-sm",
-            tagFilter === tag.id ? "text-primary" : "text-popover-foreground",
-          )}
-        >
-          {tag.name}
-        </DropdownMenuItem>
-      ))}
-    </DropdownMenuContent>
-  </DropdownMenu>
-</div>
-=======
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-center h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground rounded-md hover:bg-muted">
-                {activeFilter?.label ?? "All"}
-                <ChevronDown className="h-3 w-3" />
+            <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+              {activeFilter?.label ?? "All"}
+              <ChevronDown className="h-3 w-3" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="border-border bg-popover"
-            >
+            <DropdownMenuContent align="start" className="border-border bg-popover">
               {FILTER_OPTIONS.map((opt) => (
                 <DropdownMenuItem
                   key={opt.value}
                   onClick={() => setFilter(opt.value)}
                   className={cn(
                     "text-sm",
-                    filter === opt.value
-                      ? "text-primary"
-                      : "text-popover-foreground"
+                    filter === opt.value ? "text-primary" : "text-popover-foreground",
                   )}
                 >
                   {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+              {activeTag?.name ?? "All tags"}
+              <ChevronDown className="h-3 w-3" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="border-border bg-popover">
+              <DropdownMenuItem
+                onClick={() => setTagFilter("all")}
+                className={cn(
+                  "text-sm",
+                  tagFilter === "all" ? "text-primary" : "text-popover-foreground",
+                )}
+              >
+                All tags
+              </DropdownMenuItem>
+
+              {tags.map((tag) => (
+                <DropdownMenuItem
+                  key={tag.id}
+                  onClick={() => setTagFilter(tag.id)}
+                  className={cn(
+                    "text-sm",
+                    tagFilter === tag.id ? "text-primary" : "text-popover-foreground",
+                  )}
+                >
+                  {tag.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -527,7 +491,6 @@ useEffect(() => {
             </button>
           </div>
         )}
->>>>>>> upstream/main
       </div>
 
       {/* Conversation Items.
