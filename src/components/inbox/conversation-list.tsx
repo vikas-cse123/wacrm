@@ -294,7 +294,6 @@ export function ConversationList({
   );
 
   const activeFilter = FILTER_OPTIONS.find((o) => o.value === filter);
-  const activeTag = tags.find((tag) => tag.id === tagFilter);
 
   return (
     // w-full on mobile so the list occupies the whole viewport when it's
@@ -330,37 +329,6 @@ export function ConversationList({
                   )}
                 >
                   {opt.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex h-7 items-center justify-center gap-1 rounded-md px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-              {activeTag?.name ?? "All tags"}
-              <ChevronDown className="h-3 w-3" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="border-border bg-popover">
-              <DropdownMenuItem
-                onClick={() => setTagFilter("all")}
-                className={cn(
-                  "text-sm",
-                  tagFilter === "all" ? "text-primary" : "text-popover-foreground",
-                )}
-              >
-                All tags
-              </DropdownMenuItem>
-
-              {tags.map((tag) => (
-                <DropdownMenuItem
-                  key={tag.id}
-                  onClick={() => setTagFilter(tag.id)}
-                  className={cn(
-                    "text-sm",
-                    tagFilter === tag.id ? "text-primary" : "text-popover-foreground",
-                  )}
-                >
-                  {tag.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
