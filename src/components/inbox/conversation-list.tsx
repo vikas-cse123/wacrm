@@ -566,6 +566,22 @@ function ConversationItem({
             />
           </div>
         </div>
+        {contact?.tags && contact.tags.length > 0 && (
+          <div className="mt-1 flex flex-wrap items-center gap-1">
+            {contact.tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-foreground"
+              >
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: tag.color }}
+                />
+                {tag.name}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </button>
   );
